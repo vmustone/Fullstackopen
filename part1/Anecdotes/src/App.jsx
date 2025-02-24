@@ -43,7 +43,7 @@ const App = () => {
   const handleNext = () => {
     setSelected(Math.floor(Math.random() * 8))
   }
-  console.log(votes)
+
   return (
     <div>
       <Header text="Anecdote of the day"/>
