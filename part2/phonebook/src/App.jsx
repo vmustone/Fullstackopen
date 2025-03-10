@@ -1,75 +1,68 @@
-import { useState } from 'react'
-
-const Filter = ({value, handler}) => {
-  return (
-    <div>filter shown with
-    <input
-    value={value}
-    onChange={handler} />
-    </div>
-  )
-}
-
-const PersonForm = ({newName, newNumber, handleSubmit, handleName, handleNumber}) => {
-  return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        name: <input
-          value={newName}
-          onChange={handleName} />
-      </div>
-      <div>
-        number: <input
-          value={newNumber}
-          onChange={handleNumber} />
-      </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
-  )
-}
-
-const Persons = ({persons, filterName}) => {
-  return (
-    persons.filter((item) => filterName.trim() === "" ? true : item.name.toLowerCase().includes(filterName.toLowerCase()))
-      .map((item, index) => {
-        return <p key={index}>{item.name} {item.number}</p>
-      })
-  )
-}
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+import Persons from './Components/Persons'
+import PersonForm from './Components/Personform'
+import Filter from './Components/Filter'
+import Phonebook from './Services/Phonebook'
 
 const App = () => {
-    const [persons, setPersons] = useState([
-      { name: 'Arto Hellas', number: '040-123456' },
-      { name: 'Ada Lovelace', number: '39-44-5323523' },
-      { name: 'Dan Abramov', number: '12-43-234345' },
-      { name: 'Mary Poppendieck', number: '39-23-6423122' }
-    ])
-
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNumber] = useState('')
   const [filterName, setFilter] = useState('')
 
+  useEffect(() => {
+    Phonebook
+    .getAll()
+    .then(book => {
+      setPersons(book)
+    })
+  }, [])
+
   const handleSubmit = (event) => {
-    const nameObject = {
+    event.preventDefault();
+  
+    const personObject = {
       name: newName,
       number: newNumber
-    }
+    };
+  
+    // Varmista, että molemmat kentät on täytetty
     if (!newNumber || !newName) {
-      alert("Plese fill both fields")
-      return
+      alert("Please fill both fields");
+      return;
     }
-    event.preventDefault()
-
-    if (persons.some(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
+  
+    // Tarkista, onko henkilö jo olemassa
+    const personToUpdate = persons.find(person => person.name === newName);
+  
+    if (personToUpdate) {
+      // Jos henkilö on jo listassa, pyydetään käyttäjältä vahvistus päivitykselle
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        Phonebook
+          .replace(personToUpdate.id, newNumber, personToUpdate.name) // Oletan, että käytät replace-metodia tähän
+          .then(() => {
+            // Päivitetään henkilö listassa
+            const updatedPersons = persons.map(person => 
+              person.id === personToUpdate.id ? { ...person, number: newNumber } : person
+            );
+            setPersons(updatedPersons);
+          });
+      }
     } else {
-      setPersons(persons.concat(nameObject));
+      // Jos henkilöä ei löydy, lisätään uusi henkilö
+      Phonebook
+        .create(personObject) // Oletan, että create-metodi luo uuden henkilön
+        .then(newPerson => {
+          setPersons(persons.concat(newPerson));
+        });
     }
-    setNewName('')
-    setNumber('')
-  }
+  
+    // Tyhjennetään syöttökentät
+    setNewName('');
+    setNumber('');
+  };
+  
 
   const handleName = (event) => {
     setNewName(event.target.value)
@@ -81,6 +74,20 @@ const App = () => {
 
   const handleFilter = (event) => {
     setFilter(event.target.value)
+  }
+
+  const handleDelete = (person) => {
+    if (window.confirm(`Delete ${person.name} ?`)) {
+      Phonebook
+      .remove(person.id)
+      .then(() => {
+        return Phonebook.getAll(); // Odotetaan, että poisto on valmis
+      })
+      .then(book => {
+        console.log('Updated Book after deletion:', book);
+        setPersons(book); // Päivitetään henkilöt vasta kun uusi lista on haettu
+      })
+    }
   }
 
   return (
@@ -95,9 +102,10 @@ const App = () => {
         handleName={handleName}
         handleNumber={handleNumber} />
       <h3>Numbers</h3>
-      <Persons persons={persons} filterName={filterName}/>
+      <Persons persons={persons} filterName={filterName} handleDelete={handleDelete}/>
     </div>
   )
 }
+
 
 export default App
