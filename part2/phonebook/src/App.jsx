@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Persons from './Components/Persons'
 import PersonForm from './Components/Personform'
 import Filter from './Components/Filter'
+import Notification from './Components/Notification'
 import Phonebook from './Services/Phonebook'
 
 const App = () => {
@@ -9,12 +10,16 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNumber] = useState('')
   const [filterName, setFilter] = useState('')
+  const [notification, setMessage] = useState({message: null, color: "green"})
 
   useEffect(() => {
     Phonebook
     .getAll()
     .then(book => {
       setPersons(book)
+    })
+    .catch(error => {
+      setMessage({message: error.response.data, color: "red"})
     })
   }, [])
 
@@ -42,16 +47,39 @@ const App = () => {
               person.id === personToUpdate.id ? { ...person, number: newNumber } : person
             );
             setPersons(updatedPersons);
-          });
+            setMessage({message: `Updated ${personToUpdate.name}'s number`, color: "green"})
+
+            setTimeout(() => {
+              setMessage({message: null})
+            }, 3000)
+          })
+          .catch(error => {
+            setMessage({message: error.response.data, color: "red"})
+
+            setTimeout(() => {
+              setMessage({message: null})
+            }, 3000)
+          })
       }
     } else {
       Phonebook
         .create(personObject)
         .then(newPerson => {
-          setPersons(persons.concat(newPerson));
-        });
-    }
-  
+          setPersons(persons.concat(newPerson))
+          setMessage({message: `Added ${newPerson.name}`, color: "green"})
+
+          setTimeout(() => {
+            setMessage({message: null})
+          }, 3000)
+        })
+        .catch(error => {
+          setMessage({message: error.response.data, color: "red"})
+
+          setTimeout(() => {
+            setMessage({message: null})
+          }, 3000)
+        })
+      }
     setNewName('');
     setNumber('');
   };
@@ -73,11 +101,21 @@ const App = () => {
     if (window.confirm(`Delete ${person.name} ?`)) {
       Phonebook
       .remove(person.id)
-      .then(() => {
-        return Phonebook.getAll();
-      })
+      .then(() => Phonebook.getAll())
       .then(book => {
-        setPersons(book);
+        setPersons(book)
+        setMessage({message: `${person.name} removed`, color: "green"})
+
+        setTimeout(() => {
+          setMessage({message: null})
+      }, 3000)
+      })
+      .catch(error => {
+        setMessage({message: error.response.data, color: "red"})
+
+        setTimeout(() => {
+          setMessage({message: null})
+      }, 3000)
       })
     }
   }
@@ -85,6 +123,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification.message} color={notification.color} />
       <Filter value={filterName} handler={handleFilter} />
       <h3>Add a new</h3>
       <PersonForm

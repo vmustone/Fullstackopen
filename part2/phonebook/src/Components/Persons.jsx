@@ -3,12 +3,11 @@ const Persons = ({persons, filterName, handleDelete}) => {
       persons.filter((item) => filterName.trim() === "" ? true : item.name.toLowerCase().includes(filterName.toLowerCase()))
         .map((item) => {
           return (
-            <div key={item.id} style={{ display: "flex", alignItems: "center"}}>
-              <p>{item.name} {item.number}</p>
+            <p key={item.id}>{item.name} {item.number}
               <button onClick={() => handleDelete(item)}>Delete</button>
-            </div>
+            </p>
           )
-        })
+      })
     )
   }
 
