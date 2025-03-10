@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import Persons from './Components/Persons'
 import PersonForm from './Components/Personform'
 import Filter from './Components/Filter'
@@ -27,22 +26,18 @@ const App = () => {
       number: newNumber
     };
   
-    // Varmista, että molemmat kentät on täytetty
     if (!newNumber || !newName) {
       alert("Please fill both fields");
       return;
     }
   
-    // Tarkista, onko henkilö jo olemassa
     const personToUpdate = persons.find(person => person.name === newName);
   
     if (personToUpdate) {
-      // Jos henkilö on jo listassa, pyydetään käyttäjältä vahvistus päivitykselle
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         Phonebook
-          .replace(personToUpdate.id, newNumber, personToUpdate.name) // Oletan, että käytät replace-metodia tähän
+          .replace(personToUpdate.id, newNumber, personToUpdate.name)
           .then(() => {
-            // Päivitetään henkilö listassa
             const updatedPersons = persons.map(person => 
               person.id === personToUpdate.id ? { ...person, number: newNumber } : person
             );
@@ -50,15 +45,13 @@ const App = () => {
           });
       }
     } else {
-      // Jos henkilöä ei löydy, lisätään uusi henkilö
       Phonebook
-        .create(personObject) // Oletan, että create-metodi luo uuden henkilön
+        .create(personObject)
         .then(newPerson => {
           setPersons(persons.concat(newPerson));
         });
     }
   
-    // Tyhjennetään syöttökentät
     setNewName('');
     setNumber('');
   };
@@ -81,11 +74,10 @@ const App = () => {
       Phonebook
       .remove(person.id)
       .then(() => {
-        return Phonebook.getAll(); // Odotetaan, että poisto on valmis
+        return Phonebook.getAll();
       })
       .then(book => {
-        console.log('Updated Book after deletion:', book);
-        setPersons(book); // Päivitetään henkilöt vasta kun uusi lista on haettu
+        setPersons(book);
       })
     }
   }
