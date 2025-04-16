@@ -89,6 +89,10 @@ app.get('/api/persons', (request, response) => {
     response.json(persons);
 })
 
+app.get('/', (request, response) => {
+    response.send('<h1>Welcome to the Phonebook</h1>');
+})
+
 app.get('/info', (request, response) => {
     const now = new Date();
     const date = now.toDateString();
