@@ -90,8 +90,15 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/', (request, response) => {
-    response.send('<h1>Welcome to the Phonebook</h1>');
-})
+    response.send(`
+        <div>
+            <h1>Welcome to the Phonebook</h1>
+            <a href="https://fullstackopen-ud4j.onrender.com/api/persons">https://fullstackopen-ud4j.onrender.com/api/persons</a>
+            <a href="https://fullstackopen-ud4j.onrender.com/info">https://fullstackopen-ud4j.onrender.com/info</a>
+            <a href="https://fullstackopen-ud4j.onrender.com/api/persons/:id">https://fullstackopen-ud4j.onrender.com/api/persons/:id</a>
+        </div>
+    `);
+});
 
 app.get('/info', (request, response) => {
     const now = new Date();
