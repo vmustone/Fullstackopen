@@ -91,11 +91,10 @@ app.get('/api/persons', (request, response) => {
 
 app.get('/', (request, response) => {
     response.send(`
-        <div>
-            <h1>Welcome to the Phonebook</h1>
-            <a href="https://fullstackopen-ud4j.onrender.com/api/persons">https://fullstackopen-ud4j.onrender.com/api/persons</a>
-            <a href="https://fullstackopen-ud4j.onrender.com/info">https://fullstackopen-ud4j.onrender.com/info</a>
-            <a href="https://fullstackopen-ud4j.onrender.com/api/persons/:id">https://fullstackopen-ud4j.onrender.com/api/persons/:id</a>
+        <div> 
+            <h2>Welcome to the Phonebook</h2>
+            <a href="https://fullstackopen-ud4j.onrender.com/api/persons">https://fullstackopen-ud4j.onrender.com/api/persons</a><br>
+            <a href="https://fullstackopen-ud4j.onrender.com/info">https://fullstackopen-ud4j.onrender.com/info</a><br>
         </div>
     `);
 });
