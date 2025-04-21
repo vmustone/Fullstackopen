@@ -1,33 +1,31 @@
 const PORT = process.env.PORT || 3001;
 const express = require('express');
 const morgan = require('morgan');
-const cors = require('cors')
 const app = express();
 
-app.use(cors())
-
+app.use(express.static('dist'))
 app.use(express.json());
 
 let persons = [
     {
     "name": "Arto Hellas",
     "number": "040-123456",
-    "id": "1"
+    "id": 1
     },
     {
     "name": "Ada Lovelace",
     "number": "39-44-5323523",
-    "id": "2"
+    "id": 2
     },
     {
     "name": "Dan Abramov",
     "number": "12-43-234345",
-    "id": "3"
+    "id": 3
     },
     {
     "name": "Mary Poppendieck",
     "number": "39-23-6423122",
-    "id": "4"
+    "id": 4
     }
 ]
 
@@ -36,7 +34,7 @@ morgan.token('body', (request) => JSON.stringify(request.body));
 
 const customFormat = ':method :url :status :res[content-length] - :response-time ms :body';
 
-// Luodaan middleware-funktio, joka loggaa vain POST-pyynnöt
+
 const customMorganMiddleware = (request, response, next) => {
   if (request.method === 'POST') {
     return (morgan(customFormat)(request, response, next));
@@ -67,37 +65,9 @@ const errorMessage = (body) => {
     return null;
 }
 
-app.post('/api/persons', (request, response) => {
-    const body = request.body;
-    const error = errorMessage(body);
-
-    if (error) {
-        return response.status(error.status).json({ error: error.message });
-    }
-
-    const content = {
-        id: generateId(),
-        name: body.name,
-        number: body.number
-    };
-
-    persons = persons.concat(content);
-    response.status(201).json(content);
-})
-
 app.get('/api/persons', (request, response) => {
     response.json(persons);
 })
-
-app.get('/', (request, response) => {
-    response.send(`
-        <div> 
-            <h2>Welcome to the Phonebook</h2>
-            <a href="https://fullstackopen-ud4j.onrender.com/api/persons">https://fullstackopen-ud4j.onrender.com/api/persons</a><br>
-            <a href="https://fullstackopen-ud4j.onrender.com/info">https://fullstackopen-ud4j.onrender.com/info</a><br>
-        </div>
-    `);
-});
 
 app.get('/info', (request, response) => {
     const now = new Date();
@@ -124,9 +94,27 @@ app.get('/api/persons/:id', (request, response) => {
     
   })
 
+app.post('/api/persons', (request, response) => {
+    const body = request.body;
+    const error = errorMessage(body);
+
+    if (error) {
+        return response.status(error.status).json({ error: error.message });
+    }
+
+    const content = {
+        name: body.name,
+        number: body.number,
+        id: generateId(),
+    };
+
+    persons = persons.concat(content);
+    response.status(201).json(content);
+})
+
 app.delete('/api/persons/:id', (request, response) => {
-    const id = request.params.id;
-    const originalLength = persons.length; 
+    const id = Number(request.params.id);
+    const originalLength = persons.length;
 
     persons = persons.filter(person => person.id !== id);
     if (originalLength === persons.length) {
@@ -137,10 +125,10 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 app.put('/api/persons/:id', (request, response) => {
-    const id = request.params.id;
+    const id = Number(request.params.id);
     const { name, number } = request.body;
   
-    const index = persons.findIndex(p => Number(p.id) === Number(id));
+    const index = persons.findIndex(p => p.id === id);
     if (index === -1) {
       return response.status(404).json({ error: 'Person not found' });
     }
