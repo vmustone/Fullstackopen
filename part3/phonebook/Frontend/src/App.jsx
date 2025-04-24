@@ -19,7 +19,7 @@ const App = () => {
       setPersons(book)
     })
     .catch(error => {
-      setMessage({message: error.response.data, color: "red"})
+      setMessage({message: error.response.data.error, color: "red"})
     })
   }, [])
 
@@ -30,12 +30,7 @@ const App = () => {
       name: newName,
       number: newNumber
     };
-  
-    if (!newNumber || !newName) {
-      alert("Please fill both fields");
-      return;
-    }
-  
+
     const personToUpdate = persons.find(person => person.name === newName);
   
     if (personToUpdate) {
@@ -51,14 +46,14 @@ const App = () => {
 
             setTimeout(() => {
               setMessage({message: null})
-            }, 3000)
+            }, 4000)
           })
           .catch(error => {
-            setMessage({message: error.response.data, color: "red"})
+            setMessage({message: error.response.data.error, color: "red"})
 
             setTimeout(() => {
               setMessage({message: null})
-            }, 3000)
+            }, 4000)
           })
       }
     } else {
@@ -70,14 +65,14 @@ const App = () => {
 
           setTimeout(() => {
             setMessage({message: null})
-          }, 3000)
+          }, 4000)
         })
         .catch(error => {
-          setMessage({message: error.response.data, color: "red"})
+          setMessage({message: error.response.data.error, color: "red"})
 
           setTimeout(() => {
             setMessage({message: null})
-          }, 3000)
+          }, 4000)
         })
       }
     setNewName('');
@@ -108,14 +103,14 @@ const App = () => {
 
         setTimeout(() => {
           setMessage({message: null})
-      }, 3000)
+      }, 4000)
       })
       .catch(error => {
         setMessage({message: error.response.data, color: "red"})
 
         setTimeout(() => {
           setMessage({message: null})
-      }, 3000)
+      }, 4000)
       })
     }
   }

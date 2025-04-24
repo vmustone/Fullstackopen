@@ -16,8 +16,22 @@ mongoose.connect(url)
     })
 
 const phonebookSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    minlength: 3,
+    required: true
+  },
+  number: {
+    type: String,
+    minlength: 8,
+    validate: {
+      validator: function(v) {
+        return /^\d{2,3}-\d{7,12}$/.test(v)
+      },
+      message: props => `${props.value} Correct format 09-1234556 or 040-22334455!`
+    },
+    required: true
+  }
 })
 
 phonebookSchema.set('toJSON', {
